@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Usuarios</title>
+    <style>
+        /* ── Reset y base ── */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, sans-serif;
+            background: #f0f4f8;
+            color: #1e293b;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #0f172a;
+        }
+
+        h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #334155;
+        }
+
+        /* ── Layout ── */
+        .layout {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 1.5rem;
+            max-width: 960px;
+        }
+
+        /* ── Cards ── */
+        .card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+
+        /* ── Formulario ── */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            margin-bottom: 0.875rem;
+        }
+
+        label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #475569;
+        }
+
+        input {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #1e293b;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        input:focus {
+            border-color: #6366f1;
+        }
+
+        /* ── Botones ── */
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.15s;
+        }
+
+        .btn:hover {
+            opacity: 0.85;
+        }
+
+        .btn-primary {
+            background: #6366f1;
+            color: #fff;
+            width: 100%;
+            margin-top: 0.25rem;
+        }
+
+        .btn-get {
+            background: #0d9488;
+            color: #fff;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.6rem;
+            font-size: 0.78rem;
+        }
+
+        /* ── Lista de usuarios ── */
+        .user-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+
+        .user-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .user-email {
+            font-size: 0.78rem;
+            color: #64748b;
+        }
+
+        .user-id {
+            font-size: 0.7rem;
+            color: #94a3b8;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 0.4rem;
+        }
+
+        /* ── Log de respuestas HTTP ── */
+        .log {
+            background: #0f172a;
+            border-radius: 8px;
+            padding: 0.875rem;
+            font-family: monospace;
+            font-size: 0.78rem;
+            color: #7dd3fc;
+            height: 180px;
+            overflow-y: auto;
+            line-height: 1.7;
+        }
+
+        .log .ok {
+            color: #4ade80;
+        }
+
+        .log .err {
+            color: #f87171;
+        }
+
+        .log .info {
+            color: #94a3b8;
+        }
+
+        .log .method {
+            color: #fbbf24;
+        }
+
+        /* ── Empty state ── */
+        .empty {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 1.5rem 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Gestión de usuarios — cliente MVC</h1>
+
+    <div class="layout">
+
+        <!-- Columna izquierda: formulario -->
+        <div style="display:flex; flex-direction:column; gap:1.5rem;">
+
+            <!-- Crear usuario -->
+            <div class="card">
+                <h2>Crear usuario</h2>
+                <div class="form-group">
+                    <label for="name">Nombre</label>
+                    <input type="text" id="name" placeholder="Ana García">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="ana@ejemplo.com">
+                </div>
+                <button class="btn btn-primary" onclick="createUser()">Crear usuario (POST)</button>
+            </div>
+
+            <!-- Buscar por ID -->
+            <div class="card">
+                <h2>Buscar por ID</h2>
+                <div style="display:flex; gap:0.5rem; align-items:flex-end;">
+                    <div class="form-group" style="flex:1; margin:0;">
+                        <label for="searchId">ID</label>
+                        <input type="number" id="searchId" placeholder="1">
+                    </div>
+                    <button class="btn btn-get" onclick="getUserById()">Buscar (GET)</button>
+                </div>
+            </div>
+
+            <!-- Log HTTP -->
+            <div class="card">
+                <h2>Respuestas del servidor</h2>
+                <!--
+          Aquí se muestran las respuestas reales que devuelve
+          la API. En producción verías esto en DevTools → Network.
+        -->
+                <div class="log" id="log">
+                    <span class="info">Esperando peticiones...</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Columna derecha: lista de usuarios -->
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                <h2 style="margin:0;">Usuarios</h2>
+                <button class="btn btn-get btn-sm" onclick="loadUsers()">Recargar (GET)</button>
+            </div>
+            <div class="user-list" id="userList">
+                <p class="empty">Cargando...</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /*
+         * Este script ES el cliente de nuestra API.
+         * Usa fetch() para hacer peticiones HTTP a Express,
+         * exactamente igual que lo haría Postman o una app móvil.
+         *
+         * Cada función corresponde a un endpoint del router:
+         *   loadUsers()   → GET  /api/users
+         *   getUserById() → GET  /api/users/:id
+         *   createUser()  → POST /api/users
+         *   deleteUser()  → DELETE /api/users/:id
+         */
+
+        const API = '/api/users'; // Base URL — si abres el HTML suelto, cambia a http://localhost:3000/api/users
+
+        // ── Helpers de UI ──────────────────────────────────────────
+
+        function log(method, url, status, data) {
+            const el = document.getElementById('log');
+            const ok = status >= 200 && status < 300;
+            const ts = new Date().toLocaleTimeString();
+            el.innerHTML += `\n<span class="info">${ts}</span> <span class="method">${method}</span> ${url} → <span class="${ok ? 'ok' : 'err'}">${status}</span>\n${JSON.stringify(data, null, 2)}\n`;
+            el.scrollTop = el.scrollHeight;
+        }
+
+        function renderUsers(users) {
+            const list = document.getElementById('userList');
+            if (!users.length) {
+                list.innerHTML = '<p class="empty">No hay usuarios aún.</p>';
+                return;
+            }
+            list.innerHTML = users.map(u => `
+        <div class="user-item">
+          <div class="user-info">
+            <span class="user-name">${u.name}</span>
+            <span class="user-email">${u.email}</span>
+            <span class="user-id">ID: ${u.id}</span>
+          </div>
+          <div class="user-actions">
+            <button class="btn btn-danger btn-sm" onclick="deleteUser(${u.id})">Eliminar</button>
+          </div>
+        </div>
+      `).join('');
+        }
+
+        // ── Peticiones HTTP ────────────────────────────────────────
+
+        // GET /api/users — trae todos los usuarios
+        async function loadUsers() {
+            const res = await fetch(API);
+            const data = await res.json();
+            log('GET', API, res.status, data);
+            renderUsers(data);
+        }
+
+        // GET /api/users/:id — busca uno por ID
+        async function getUserById() {
+            const id = document.getElementById('searchId').value;
+            const res = await fetch(`${API}/${id}`);
+            const data = await res.json();
+            log('GET', `${API}/${id}`, res.status, data);
+        }
+
+        // POST /api/users — crea un usuario nuevo
+        async function createUser() {
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+
+            /*
+             * fetch con method:'POST' y body en JSON.
+             * El header Content-Type le dice a Express que el body es JSON,
+             * así el middleware express.json() puede leerlo en req.body.
+             */
+            const res = await fetch(API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email }),
+            });
+
+            const data = await res.json();
+            log('POST', API, res.status, data);
+
+            if (res.ok) {
+                document.getElementById('name').value = '';
+                document.getElementById('email').value = '';
+                loadUsers(); // Recarga la lista
+            }
+        }
+
+        // DELETE /api/users/:id — elimina un usuario
+        async function deleteUser(id) {
+            const res = await fetch(`${API}/${id}`, { method: 'DELETE' });
+            log('DELETE', `${API}/${id}`, res.status, { deleted: id });
+            loadUsers();
+        }
+
+        // Carga inicial al abrir la página
+        loadUsers();
+    </script>
+
+</body>
+
+</html>
